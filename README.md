@@ -146,7 +146,7 @@ cp .env.example .env
 npm start
 ```
 
-Default server runs on port `5000`. Access the admin dashboard at `http://localhost:5000/admin`.
+Default server listens on port `5000` with the admin dashboard accessible at `/admin`.
 
 ---
 
