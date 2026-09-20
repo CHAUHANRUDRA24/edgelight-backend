@@ -1,167 +1,162 @@
 <div align="center">
 
-  <h1>⚡ Edge Light Backend & Admin API</h1>
+  # Edge Light — Backend & Admin API
 
-  **Centralized Firestore Licensing Server, Razorpay Payment Webhooks & Real-Time Admin Console**
+  **Firestore licensing server, payment webhooks, and administrative console**
 
-  [![GitHub Stars](https://img.shields.io/github/stars/CHAUHANRUDRA24/edgelight-backend?style=for-the-badge&logo=github)](https://github.com/CHAUHANRUDRA24/edgelight-backend)
-  [![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com)
-  [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
-  [![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express)](https://expressjs.com)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+  [![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com)
+  [![Node](https://img.shields.io/badge/Node-%3E%3D18.0-339933?style=flat-square&logo=node.js)](https://nodejs.org)
+  [![Express](https://img.shields.io/badge/Express-4.21-000000?style=flat-square&logo=express)](https://expressjs.com)
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-  <br>
-
-  [API Reference](#-api-endpoints) • [Webhook Setup](#-razorpay-webhook-integration) • [Admin Console](#-live-admin-console) • [Author](#-maintainer--author)
+  [API Reference](#api-reference) • [Webhooks](#payment-webhooks) • [Admin Dashboard](#admin-dashboard)
 
 </div>
 
 ---
 
-## 📖 Overview
+## Overview
 
-The **Edge Light Backend** provides the cloud infrastructure for Edge Light desktop clients. It manages device registrations, license verification, real-time activity heartbeats, payment webhook processing from Razorpay, and hosts the live Web Admin Dashboard.
-
----
-
-## 🌟 Features
-
-- **Centralized Device Management**: Tracks machine registrations, Hardware IDs (`HWID`), Windows hostnames, client versions, and online/offline status.
-- **Automated Razorpay Webhooks**: Validates cryptographic HMAC-SHA256 signatures and automatically grants lifetime or subscription license approvals upon successful payment.
-- **Real-Time Web Admin Console**: Standalone web portal powered by the Firebase JS SDK v10 with live `onSnapshot` updates and 1-click **Approve**, **Reject**, and **Reset Trial** controls.
-- **Firestore Security Rules**: Pre-configured production rules protecting documents in the `licenses` collection.
-- **Zero-Friction Deployment**: Single-command deployment to Firebase Hosting and Cloud Functions or standard Node.js servers.
+The **Edge Light Backend** provides authentication, licensing management, and administrative control for the Edge Light desktop client. It handles machine registrations, validates license statuses, receives payment webhooks, and powers a real-time web dashboard for license provisioning.
 
 ---
 
-## 🔌 API Endpoints
+## Features
 
-### 1. Verify Device License
-- **Method**: `GET`
-- **URL**: `/api/licenses/verify/:hwid`
-- **Response**:
-  ```json
-  {
-    "exists": true,
-    "hwid": "CAA0-7C92-AC5D-B662",
-    "status": "approved",
-    "pcName": "DESKTOP-PRO",
-    "lastActiveAt": "2026-09-20T21:40:00Z"
-  }
-  ```
+- **Device Verification**: Validates hardware identifiers (`HWID`), hostnames, client versions, and activity timestamps.
+- **Payment Webhook Processing**: Verifies Razorpay signatures (HMAC-SHA256) and updates licenses upon successful checkout.
+- **Real-Time Admin Console**: Web-based dashboard utilizing Firestore real-time listeners (`onSnapshot`) with single-click actions to approve, reject, or reset trials.
+- **Access Control**: Built-in Firestore security rules protecting the `licenses` collection.
+- **Flexible Deployment**: Supports standard Node.js servers, Firebase Cloud Functions, or Docker containers.
 
-### 2. Auto-Register New Installation
-- **Method**: `POST`
-- **URL**: `/api/licenses/register`
-- **Payload**:
-  ```json
-  {
-    "hwid": "CAA0-7C92-AC5D-B662",
-    "fullHwid": "730B81771046C76D...",
-    "pcName": "DESKTOP-WORK",
-    "appVersion": "1.0.3"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "registered": true,
-    "status": "trial"
-  }
-  ```
+---
+
+## API Reference
+
+### 1. Verify License Status
+
+```http
+GET /api/licenses/verify/:hwid
+```
+
+**Response (`200 OK`)**:
+```json
+{
+  "exists": true,
+  "hwid": "CAA0-7C92-AC5D-B662",
+  "status": "approved",
+  "pcName": "DESKTOP-WORK",
+  "lastActiveAt": "2026-09-20T21:40:00Z"
+}
+```
+
+---
+
+### 2. Register Device
+
+```http
+POST /api/licenses/register
+```
+
+**Payload**:
+```json
+{
+  "hwid": "CAA0-7C92-AC5D-B662",
+  "fullHwid": "730B81771046C76D...",
+  "pcName": "DESKTOP-WORK",
+  "appVersion": "1.0.3"
+}
+```
+
+**Response (`200 OK`)**:
+```json
+{
+  "registered": true,
+  "status": "trial"
+}
+```
+
+---
 
 ### 3. Razorpay Payment Webhook
-- **Method**: `POST`
-- **URL**: `/api/webhooks/razorpay`
-- **Headers**: `x-razorpay-signature: <hmac_sha256_hash>`
-- **Action**: Extracts `hwid` from payment notes and updates the Firestore license to `status: 'approved'`.
+
+```http
+POST /api/webhooks/razorpay
+Header: x-razorpay-signature: <hmac_sha256_hash>
+```
+
+Parses the payment payload, extracts the device HWID from order notes, and updates the device license status to `approved`.
 
 ---
 
-## 📊 Live Admin Console
+## Admin Dashboard
 
-The `/admin` portal (`admin-dashboard/index.html`) is an interactive management console with:
-- **Real-Time Telemetry Cards**:
-  - Total Downloads / Registered Machines
-  - Active Users in the last 24h
-  - Active 3-Day Trials
-  - Approved Commercial Pro Licenses
-  - Blocked / Rejected Machines
-- **Device Management Grid**:
-  - Instant search by Device Name or HWID
-  - 1-click **Approve** (activates commercial license)
-  - 1-click **Reject** (revokes access)
-  - 1-click **Reset Trial** (resets machine to 3-day evaluation)
-  - 1-click **Delete (🗑️)** (removes record from Firestore)
+Located in `admin-dashboard/index.html`, the admin interface provides:
+- Live metrics: Total installations, active 24h users, trials, and active pro licenses.
+- Searchable device table by HWID or machine name.
+- Management actions: **Approve**, **Reject**, **Reset Trial (3 Days)**, and **Delete**.
 
 ---
 
-## 💳 Razorpay Webhook Integration
-
-To connect Razorpay with automatic license provisioning:
-1. Go to **Razorpay Dashboard → Settings → Webhooks**.
-2. Click **Add New Webhook**.
-3. **Webhook URL**: `https://your-backend-domain.com/api/webhooks/razorpay`
-4. **Secret**: Enter a secure random string and put it in `.env` as `RAZORPAY_WEBHOOK_SECRET`.
-5. **Active Events**: Check `payment.captured` and `order.paid`.
-6. Whenever a customer pays via link or QR code, their license is approved automatically!
-
----
-
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 backend/
-├── admin-dashboard/         # Real-time Web Admin Console (Firebase JS SDK v10)
+├── admin-dashboard/                 # Real-time web admin console
 │   └── index.html
-├── api/                     # Specialized route handlers
-├── firebase.json            # Firebase Hosting & Firestore deploy settings
-├── firestore.rules          # Firestore database security rules
-├── package.json             # Dependencies (express, cors, firebase-admin)
-├── server.js                # Express application & webhook listener
-├── .env.example             # Environment template
-├── .gitignore
+├── api/                             # REST API handlers & endpoints
+│   ├── server.js                    # Express application entry point
+│   ├── routes.js                    # Route definitions
+│   └── webhooks.js                  # Razorpay signature verification
+├── config/                          # Firebase configuration and credentials
+│   └── firebase-config.js
+├── firestore.rules                  # Security rules for Firestore
+├── .env.example                     # Environment template
+├── package.json
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## Setup & Running
 
-### 1. Install Dependencies
+### Prerequisites
+
+- [Node.js](https://nodejs.org) (v18 or later)
+- A Firebase project with Firestore enabled
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/CHAUHANRUDRA24/edgelight-backend.git
+cd edgelight-backend
+
+# Install dependencies
 npm install
-```
 
-### 2. Configure Environment
-Copy `.env.example` to `.env`:
-```bash
+# Configure environment variables
 cp .env.example .env
 ```
-Fill in your Firebase credentials (`edge-light-24`) and Razorpay secrets.
 
-### 3. Run Locally
+### Start Server
+
 ```bash
+# Start backend server
 npm start
 ```
-- API Server: `http://localhost:4000`
-- Admin Dashboard: `http://localhost:4000/admin`
 
-### 4. Deploy to Firebase
-```bash
-firebase deploy
-```
+Default server runs on port `5000`. Access the admin dashboard at `http://localhost:5000/admin`.
 
 ---
 
-## 👨‍💻 Maintainer & Author
+## Author
 
-- **Author**: **CHAUHANRUDRA24**
-- **Email**: [rudrachauhan2475@gmail.com](mailto:rudrachauhan2475@gmail.com)
-- **GitHub**: [@CHAUHANRUDRA24](https://github.com/CHAUHANRUDRA24)
+- **Maintainer**: Chauhan Rudra ([@CHAUHANRUDRA24](https://github.com/CHAUHANRUDRA24))
+- **Contact**: rudrachauhan2475@gmail.com
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE).
