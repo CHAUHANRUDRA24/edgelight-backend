@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge Light — License & Device Admin Console</title>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --card-bg: rgba(22, 26, 35, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #ff9800;
+      --accent-glow: rgba(255, 152, 0, 0.18);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, #1a1e29 0%, #0d0f14 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 30px 40px;
+    }
+
+    /* Top Nav */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #ffb366, #ff7700);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 8px 16px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-primary:hover {
+      background: #ffa726;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-color: var(--card-border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Filter Bar */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .search-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: #fff;
+      font-size: 13px;
+      width: 320px;
+      outline: none;
+    }
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    /* Database activation notice banner */
+    .db-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .db-banner-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .db-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .db-banner-icon {
+      font-size: 24px;
+    }
+    .db-banner-text {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .db-banner-text strong {
+      display: block;
+      color: #fbbf24;
+      font-size: 13.5px;
+      margin-bottom: 2px;
+    }
+    .btn-banner {
+      background: #f59e0b;
+      color: #000;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 12.5px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .btn-banner:hover {
+      background: #d97706;
+      color: #fff;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .hwid-badge {
+      font-family: 'Consolas', monospace;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ffd8a8;
+      letter-spacing: 0.05em;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .status-approved { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-trial { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-expired { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .action-btn {
+      padding: 5px 10px;
+      font-size: 11.5px;
+      border-radius: 6px;
+    }
+    .btn-approve { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+    .btn-approve:hover { background: #10b981; color: #000; }
+    .btn-reject { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+    .btn-reject:hover { background: #ef4444; color: #fff; }
+    .btn-reset { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+    .btn-reset:hover { background: #3b82f6; color: #fff; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #181c25;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 480px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .modal-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .form-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .online-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      margin-right: 6px;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .offline-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">✨</div>
+      <div>
+        <h1>Edge Light Admin Console</h1>
+        <p>Live device authorization, active users & hardware license management</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" id="configBtn">⚙️ Firebase Settings</button>
+      <button class="btn-primary" id="refreshBtn">🔄 Refresh Data</button>
+    </div>
+  </header>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-title">Total Installs / Downloads <span>📥</span></div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-desc">Unique devices registered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Active Users (24h) <span>🟢</span></div>
+      <div class="stat-value" style="color: #34d399;" id="statActive">0</div>
+      <div class="stat-desc">Live heartbeats recorded</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Active 3-Day Trials <span>⏳</span></div>
+      <div class="stat-value" style="color: #fbbf24;" id="statTrial">0</div>
+      <div class="stat-desc">Evaluating Edge Light</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Approved Commercial <span>🔒</span></div>
+      <div class="stat-value" style="color: #60a5fa;" id="statApproved">0</div>
+      <div class="stat-desc">Permanent licenses granted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Rejected / Blocked <span>🚫</span></div>
+      <div class="stat-value" style="color: #f87171;" id="statRejected">0</div>
+      <div class="stat-desc">Unauthorized devices</div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-container">
+    <div class="table-header">
+      <h2 style="font-size: 16px; font-weight: 700;">Authorized Machines & Licenses</h2>
+      <input type="text" class="search-box" id="searchInput" placeholder="Search by Device Name or HWID…">
+    </div>
+
+    <!-- Live Firebase Warning / Setup Notice (shown if Firestore database is not created yet) -->
+    <div id="dbWarningBanner" class="db-banner" style="display: none;">
+      <div class="db-banner-content">
+        <div class="db-banner-left">
+          <span class="db-banner-icon">⚠️</span>
+          <div class="db-banner-text">
+            <strong>Firestore Database Needs Activation:</strong>
+            <span>Cloud Firestore has not been activated in Firebase project <code>edge-light-24</code> yet. Click the button to create it in the Firebase Console so devices sync live.</span>
+          </div>
+        </div>
+        <a href="https://console.firebase.google.com/project/edge-light-24/firestore" target="_blank" class="btn-banner">Create Database in Firebase Console →</a>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Device Name</th>
+          <th>Hardware ID (HWID)</th>
+          <th>First Installed</th>
+          <th>Last Active</th>
+          <th>Version</th>
+          <th style="text-align: right;">License Actions</th>
+        </tr>
+      </thead>
+      <tbody id="devicesTableBody">
+        <!-- Rendered dynamically -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Firebase Config Modal -->
+  <div class="modal" id="configModal">
+    <div class="modal-content">
+      <div class="modal-title">Firebase Firestore Setup</div>
+      <div class="modal-desc">
+        Connected to Firebase project <code>edge-light-24</code>. You can customize the collection name or project credentials below.
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="cfgProjectId">Firebase Project ID</label>
+        <input type="text" class="form-input" id="cfgProjectId" value="edge-light-24">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="cfgApiKey">Firebase Web API Key</label>
+        <input type="text" class="form-input" id="cfgApiKey" value="AIzaSyD3rx21xx-Fz2iWk367chc3HIcfY2Y5bAU">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="cfgCollection">Collection Name</label>
+        <input type="text" class="form-input" id="cfgCollection" value="licenses">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="closeConfigBtn">Cancel</button>
+        <button class="btn-primary" id="saveConfigBtn">Save & Reconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Web SDK (Modular v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      onSnapshot, 
+      setDoc, 
+      deleteDoc, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
+
+    // Active Firebase Configuration
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyD3rx21xx-Fz2iWk367chc3HIcfY2Y5bAU",
+      authDomain: "edge-light-24.firebaseapp.com",
+      projectId: "edge-light-24",
+      storageBucket: "edge-light-24.firebasestorage.app",
+      messagingSenderId: "1048711466271",
+      appId: "1:1048711466271:web:92f149fb95d7f64358f42a",
+      measurementId: "G-79ZK0P075W"
+    };
+
+    // Storage keys
+    const CFG_PROJECT = 'el_admin_project_id';
+    const CFG_KEY = 'el_admin_api_key';
+    const CFG_COLLECTION = 'el_admin_collection';
+
+    function getActiveConfig() {
+      const p = localStorage.getItem(CFG_PROJECT) || defaultFirebaseConfig.projectId;
+      const k = localStorage.getItem(CFG_KEY) || defaultFirebaseConfig.apiKey;
+      const c = localStorage.getItem(CFG_COLLECTION) || 'licenses';
+      return {
+        ...defaultFirebaseConfig,
+        projectId: p,
+        apiKey: k,
+        collection: c
+      };
+    }
+
+    let app = null;
+    let db = null;
+    let unsubscribeSnapshot = null;
+    let currentDevices = [];
+
+    // Fallback demo data shown when database is empty or not yet activated
+    const demoDevices = [
+      {
+        hwid: 'CAA0-7C92-AC5D-B662',
+        pcName: 'DESKTOP-PRO-SHANI',
+        status: 'trial',
+        registeredAt: new Date(Date.now() - 3600000 * 18).toISOString(),
+        lastActiveAt: new Date(Date.now() - 3600000 * 1).toISOString(),
+        appVersion: '1.0.3'
+      },
+      {
+        hwid: '8F2B-44A1-E09C-112A',
+        pcName: 'LAPTOP-OFFICE-01',
+        status: 'approved',
+        registeredAt: new Date(Date.now() - 3600000 * 96).toISOString(),
+        lastActiveAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+        appVersion: '1.0.3'
+      },
+      {
+        hwid: '3D71-998C-FA02-B817',
+        pcName: 'WORKSTATION-X',
+        status: 'expired',
+        registeredAt: new Date(Date.now() - 3600000 * 120).toISOString(),
+        lastActiveAt: new Date(Date.now() - 3600000 * 75).toISOString(),
+        appVersion: '1.0.3'
+      }
+    ];
+
+    function showDbWarning(err) {
+      const banner = document.getElementById('dbWarningBanner');
+      if (banner) banner.style.display = 'block';
+    }
+
+    function hideDbWarning() {
+      const banner = document.getElementById('dbWarningBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    function initFirebase() {
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
+      }
+
+      const cfg = getActiveConfig();
+      try {
+        app = initializeApp(cfg);
+        db = getFirestore(app);
+        isSupported().then(yes => { if (yes) getAnalytics(app); }).catch(() => {});
+
+        // Real-time live Firestore listener on licenses collection
+        const colRef = collection(db, cfg.collection);
+        unsubscribeSnapshot = onSnapshot(colRef, (snapshot) => {
+          hideDbWarning();
+          const items = [];
+          snapshot.forEach(docSnap => {
+            const f = docSnap.data();
+            items.push({
+              hwid: f.hwid || docSnap.id,
+              pcName: f.pcName || 'Unknown PC',
+              status: f.status || 'trial',
+              registeredAt: f.registeredAt ? (f.registeredAt.toDate ? f.registeredAt.toDate().toISOString() : f.registeredAt) : '',
+              lastActiveAt: f.lastActiveAt ? (f.lastActiveAt.toDate ? f.lastActiveAt.toDate().toISOString() : f.lastActiveAt) : '',
+              appVersion: f.appVersion || '1.0.3'
+            });
+          });
+
+          if (items.length > 0) {
+            currentDevices = items;
+            renderDevices(currentDevices);
+          } else {
+            // No items yet in Firestore, show initial guide or demo entries
+            currentDevices = [...demoDevices];
+            renderDevices(currentDevices);
+          }
+        }, (err) => {
+          console.warn('Firestore real-time subscription error:', err.message);
+          showDbWarning(err);
+          currentDevices = [...demoDevices];
+          renderDevices(currentDevices);
+        });
+
+      } catch (err) {
+        console.error('Firebase initialization error:', err);
+        showDbWarning(err);
+        currentDevices = [...demoDevices];
+        renderDevices(currentDevices);
+      }
+    }
+
+    // Expose actions to global scope for button clicks
+    window.updateDeviceStatus = async function(hwid, newStatus) {
+      if (!db) {
+        const d = currentDevices.find(x => x.hwid === hwid);
+        if (d) d.status = newStatus;
+        renderDevices(currentDevices);
+        return;
+      }
+
+      try {
+        const cfg = getActiveConfig();
+        const docRef = doc(db, cfg.collection, hwid);
+        await setDoc(docRef, {
+          status: newStatus,
+          hwid: hwid,
+          lastUpdated: serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        alert('Could not update Firestore document: ' + err.message);
+      }
+    };
+
+    window.deleteDevice = async function(hwid) {
+      if (!confirm(`Are you sure you want to delete device ${hwid}?`)) return;
+      if (!db) {
+        currentDevices = currentDevices.filter(x => x.hwid !== hwid);
+        renderDevices(currentDevices);
+        return;
+      }
+      try {
+        const cfg = getActiveConfig();
+        await deleteDoc(doc(db, cfg.collection, hwid));
+      } catch (err) {
+        alert('Delete failed: ' + err.message);
+      }
+    };
+
+    function renderDevices(list) {
+      const tbody = document.getElementById('devicesTableBody');
+      tbody.innerHTML = '';
+
+      let total = list.length;
+      let active = 0;
+      let trial = 0;
+      let approved = 0;
+      let rejected = 0;
+
+      const now = Date.now();
+      const oneDayMs = 24 * 3600 * 1000;
+
+      list.forEach(dev => {
+        const lastActiveMs = dev.lastActiveAt ? new Date(dev.lastActiveAt).getTime() : 0;
+        const isOnline = lastActiveMs > 0 && (now - lastActiveMs < oneDayMs);
+        if (isOnline) active++;
+
+        if (dev.status === 'approved') approved++;
+        else if (dev.status === 'trial') trial++;
+        else if (dev.status === 'rejected') rejected++;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <span class="status-pill status-${dev.status}">
+              ${dev.status === 'approved' ? '✓ Approved' : dev.status === 'trial' ? '⏳ 3-Day Trial' : dev.status === 'expired' ? '⌛ Expired' : '🚫 Rejected'}
+            </span>
+          </td>
+          <td>
+            <strong>${escapeHtml(dev.pcName)}</strong>
+          </td>
+          <td>
+            <span class="hwid-badge">${escapeHtml(dev.hwid)}</span>
+          </td>
+          <td style="color: var(--text-muted);">${dev.registeredAt ? new Date(dev.registeredAt).toLocaleDateString() : '—'}</td>
+          <td>
+            ${isOnline ? '<span class="online-indicator"></span>Active' : '<span class="offline-indicator"></span>Inactive'}
+            <span style="font-size:11px;color:var(--text-muted);display:block;">${dev.lastActiveAt ? new Date(dev.lastActiveAt).toLocaleString() : '—'}</span>
+          </td>
+          <td><span style="color:var(--text-muted);">v${escapeHtml(dev.appVersion)}</span></td>
+          <td style="text-align: right;">
+            <div style="display:inline-flex;gap:6px;">
+              <button class="action-btn btn-approve" onclick="updateDeviceStatus('${escapeHtml(dev.hwid)}', 'approved')">Approve</button>
+              <button class="action-btn btn-reject" onclick="updateDeviceStatus('${escapeHtml(dev.hwid)}', 'rejected')">Reject</button>
+              <button class="action-btn btn-reset" onclick="updateDeviceStatus('${escapeHtml(dev.hwid)}', 'trial')">Reset Trial</button>
+              <button class="action-btn btn-reject" style="opacity:0.75;" onclick="deleteDevice('${escapeHtml(dev.hwid)}')">🗑️</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statActive').textContent = active;
+      document.getElementById('statTrial').textContent = trial;
+      document.getElementById('statApproved').textContent = approved;
+      document.getElementById('statRejected').textContent = rejected;
+    }
+
+    function escapeHtml(s) {
+      return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Modal Events
+    const modal = document.getElementById('configModal');
+    document.getElementById('configBtn').onclick = () => {
+      const cfg = getActiveConfig();
+      document.getElementById('cfgProjectId').value = cfg.projectId;
+      document.getElementById('cfgApiKey').value = cfg.apiKey;
+      document.getElementById('cfgCollection').value = cfg.collection;
+      modal.classList.add('active');
+    };
+    document.getElementById('closeConfigBtn').onclick = () => modal.classList.remove('active');
+    document.getElementById('saveConfigBtn').onclick = () => {
+      localStorage.setItem(CFG_PROJECT, document.getElementById('cfgProjectId').value.trim());
+      localStorage.setItem(CFG_KEY, document.getElementById('cfgApiKey').value.trim());
+      localStorage.setItem(CFG_COLLECTION, document.getElementById('cfgCollection').value.trim() || 'licenses');
+      modal.classList.remove('active');
+      initFirebase();
+    };
+
+    document.getElementById('refreshBtn').onclick = () => {
+      initFirebase();
+    };
+
+    // Filter search
+    document.getElementById('searchInput').oninput = (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      const filtered = currentDevices.filter(d => 
+        (d.pcName && d.pcName.toLowerCase().includes(q)) || 
+        (d.hwid && d.hwid.toLowerCase().includes(q)) ||
+        (d.status && d.status.toLowerCase().includes(q))
+      );
+      renderDevices(filtered);
+    };
+
+    // Initial Firebase Connection
+    initFirebase();
+  </script>
+</body>
+</html>

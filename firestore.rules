@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Edge Light licenses collection
+    match /licenses/{hwid} {
+      // Allow devices to read their own license status and register
+      allow read: if true;
+      allow create, update: if true;
+      // Disallow client-side deletion (admin only via console or server)
+      allow delete: if request.auth != null;
+    }
+  }
+}

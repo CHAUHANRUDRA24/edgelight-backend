@@ -1,0 +1,19 @@
+{
+  "name": "edgelight-backend",
+  "version": "1.0.0",
+  "description": "Cloud Firestore licensing API, Razorpay payment webhooks, and Admin Console for Edge Light",
+  "main": "server.js",
+  "author": "CHAUHANRUDRA24 <rudrachauhan2475@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "deploy": "firebase deploy"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "firebase-admin": "^12.6.0"
+  }
+}
